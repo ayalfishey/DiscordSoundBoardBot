@@ -17,7 +17,8 @@ namespace DiscordSoundBoard
         public static CommandService commands;
         public static IAudioClient _vClient;
         private static bool playingSong = false;
-        private string path = @"D:\SoundClips\";
+        private string path;    //@"D:\SoundClips\"
+        private string botToken;
 
 
         public SBBot()
@@ -53,6 +54,12 @@ namespace DiscordSoundBoard
                 await e.Channel.DeleteMessages(messagesToDelete);
              
             });
+            path = System.Configuration.ConfigurationManager.AppSettings["SoundPath"];
+            botToken = System.Configuration.ConfigurationManager.AppSettings["DiscordToken"];
+            if (System.Configuration.ConfigurationManager.AppSettings["SoundPath"]== "NULL" || System.Configuration.ConfigurationManager.AppSettings["DiscordToken"]=="NULL") {
+                Console.WriteLine("Please edit the config file before running");
+                Environment.Exit(0);
+
             var allfiles = Directory
                 .EnumerateFiles(path, "*", SearchOption.AllDirectories)
                 .Select(Path.GetFileNameWithoutExtension);
@@ -66,8 +73,8 @@ namespace DiscordSoundBoard
 
             bot.ExecuteAndWait(async () =>
             {
-                await bot.Connect("MjM4OTExMzEyNjAyNzI2NDAw.CutHWQ.HNCEnmMWraiRtgFx7v-RBou7XoA", TokenType.Bot);
-
+                //await bot.Connect("MjM4OTExMzEyNjAyNzI2NDAw.CutHWQ.HNCEnmMWraiRtgFx7v-RBou7XoA", TokenType.Bot);
+                await bot.Connect(botToken, TokenType.Bot);
             });
         }
         private void Log(object sender, LogMessageEventArgs e)
