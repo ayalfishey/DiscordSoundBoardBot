@@ -2,6 +2,7 @@
 
 Simple discord bot 
 
-#TO DO
+You need to generate your own discord bot token
+https://discordapp.com/developers/docs/topics/oauth2
 
-request path for music files folder and key
+this can run this bot localy or off a server
