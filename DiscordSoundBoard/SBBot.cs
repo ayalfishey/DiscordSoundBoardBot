@@ -23,18 +23,19 @@ namespace DiscordSoundBoard
 
         public SBBot()
         {
+            //Setting Up Logger
             bot = new DiscordClient(x =>
                 {
                     x.LogLevel = LogSeverity.Info;
                     x.LogHandler = Log;
                 });
-
+            //Setting Up Audio
             bot.UsingAudio(x =>
            {
                x.Mode = AudioMode.Outgoing;
            });
 
-            
+            //Setting Up Commands
             bot.UsingCommands(x =>
            {
                x.PrefixChar = '!';
@@ -43,49 +44,70 @@ namespace DiscordSoundBoard
 		   });
 			commands = bot.GetService<CommandService>();
 
+            //Command clears all messeges but the first one
             commands.CreateCommand("clear")
                 .Do(async (e) =>
             {
                 Message[] messagesToDelete;
-                messagesToDelete = await e.Channel.DownloadMessages(100);
-                var temp = new List<Message>(messagesToDelete);
-                temp.RemoveAt(messagesToDelete.Length-1);
-                messagesToDelete = temp.ToArray();
-                await e.Channel.DeleteMessages(messagesToDelete);
+                messagesToDelete = await e.Channel.DownloadMessages(100); //request 100 last posts
+                var temp = new List<Message>(messagesToDelete); //convert thhe array of messeges to a list for easier managment
+                temp.RemoveAt(messagesToDelete.Length-1); //removes the first messege from the list
+                messagesToDelete = temp.ToArray();  //convert it back to array
+                await e.Channel.DeleteMessages(messagesToDelete); //delete messeges
              
             });
-            path = System.Configuration.ConfigurationManager.AppSettings["SoundPath"];
-            botToken = System.Configuration.ConfigurationManager.AppSettings["DiscordToken"];
-            if (System.Configuration.ConfigurationManager.AppSettings["SoundPath"]== "NULL" || System.Configuration.ConfigurationManager.AppSettings["DiscordToken"]=="NULL") {
+            path = System.Configuration.ConfigurationManager.AppSettings["SoundPath"]; //get path from config file
+            botToken = System.Configuration.ConfigurationManager.AppSettings["DiscordToken"]; //get token from config file
+            if (System.Configuration.ConfigurationManager.AppSettings["SoundPath"] == "NULL" || System.Configuration.ConfigurationManager.AppSettings["DiscordToken"] == "NULL") //if path or token were not changed make sure to edit them
+            {
                 Console.WriteLine("Please edit the config file before running");
                 Environment.Exit(0);
-
-            var allfiles = Directory
-                .EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                .Select(Path.GetFileNameWithoutExtension);
-
-            foreach (String com in allfiles)
+            }
+            // get all the files in the sound directory without the extention
+            try
             {
-                Console.WriteLine(com);
-                LoadCommands(com);
+                var allfiles = Directory
+                    .EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                    .Select(Path.GetFileNameWithoutExtension);
+                //make a command for each of those files based on its name
+                foreach (String com in allfiles)
+                {
+                    Console.WriteLine(com);
+                    LoadCommand(com);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Bad Folder Path");
+                Environment.Exit(0);
             }
 
-
+            //connect using bot token
             bot.ExecuteAndWait(async () =>
             {
-                //await bot.Connect("MjM4OTExMzEyNjAyNzI2NDAw.CutHWQ.HNCEnmMWraiRtgFx7v-RBou7XoA", TokenType.Bot);
-                await bot.Connect(botToken, TokenType.Bot);
+                try
+                {
+                    await bot.Connect(botToken, TokenType.Bot);
+                }
+                catch
+                {
+                    Console.WriteLine("\nBad Bot Token");
+                    Environment.Exit(0);
+                }
             });
         }
         private void Log(object sender, LogMessageEventArgs e)
         {
             Console.WriteLine(e.Message);
         }
-        private void LoadCommands(String command)
+
+        //Create a single command
+        private void LoadCommand(String command)
         {
             commands.CreateCommand(command)
                 .Do(async (e) =>
             {
+                //if file is not playing find users channel and play audio
                 if (!playingSong)
                 {
                     Channel voiceChannel = e.User.VoiceChannel;
