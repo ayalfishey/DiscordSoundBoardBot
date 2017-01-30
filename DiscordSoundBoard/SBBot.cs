@@ -19,6 +19,7 @@ namespace DiscordSoundBoard
         private static bool playingSong = false;
         private string path;    //@"D:\SoundClips\"
         private string botToken;
+        private IEnumerable<String> allfiles;
 
 
         public SBBot()
@@ -41,8 +42,8 @@ namespace DiscordSoundBoard
                x.PrefixChar = '!';
                x.AllowMentionPrefix = true;
 
-		   });
-			commands = bot.GetService<CommandService>();
+           });
+            commands = bot.GetService<CommandService>();
 
             //Command clears all messeges but the first one
             commands.CreateCommand("clear")
@@ -51,11 +52,12 @@ namespace DiscordSoundBoard
                 Message[] messagesToDelete;
                 messagesToDelete = await e.Channel.DownloadMessages(100); //request 100 last posts
                 var temp = new List<Message>(messagesToDelete); //convert thhe array of messeges to a list for easier managment
-                temp.RemoveAt(messagesToDelete.Length-1); //removes the first messege from the list
+                temp.RemoveAt(messagesToDelete.Length - 1); //removes the first messege from the list
                 messagesToDelete = temp.ToArray();  //convert it back to array
                 await e.Channel.DeleteMessages(messagesToDelete); //delete messeges
-             
+
             });
+
             path = System.Configuration.ConfigurationManager.AppSettings["SoundPath"]; //get path from config file
             botToken = System.Configuration.ConfigurationManager.AppSettings["DiscordToken"]; //get token from config file
             if (System.Configuration.ConfigurationManager.AppSettings["SoundPath"] == "NULL" || System.Configuration.ConfigurationManager.AppSettings["DiscordToken"] == "NULL") //if path or token were not changed make sure to edit them
@@ -63,10 +65,11 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Please edit the config file before running");
                 Environment.Exit(0);
             }
+
             // get all the files in the sound directory without the extention
             try
             {
-                var allfiles = Directory
+                allfiles = Directory
                     .EnumerateFiles(path, "*", SearchOption.AllDirectories)
                     .Select(Path.GetFileNameWithoutExtension);
                 //make a command for each of those files based on its name
@@ -81,6 +84,20 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Bad Folder Path");
                 Environment.Exit(0);
             }
+
+            commands.CreateCommand("help")
+              .Do(async (e) =>
+            {
+                String list= "!Clear, ";
+                foreach (String com in allfiles)
+                {
+                    list +="!"+com+", ";
+                }
+                await e.Channel.SendMessage(list); //delete messeges
+
+            });
+
+
 
             //connect using bot token
             bot.ExecuteAndWait(async () =>
@@ -111,7 +128,7 @@ namespace DiscordSoundBoard
                 if (!playingSong)
                 {
                     Channel voiceChannel = e.User.VoiceChannel;
-                    await SendAudio(path+command+".mp3", voiceChannel);
+                    await SendAudio(path + command + ".mp3", voiceChannel);
                 }
             });
         }
