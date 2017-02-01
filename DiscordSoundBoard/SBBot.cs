@@ -133,6 +133,10 @@ namespace DiscordSoundBoard
             });
         }
 
+
+        // Thank you to Rand from the Discord API Discord for this peace of code ajusted by me to fit this project
+        //(https://github.com/DjRand/)
+
         public static async Task SendAudio(string filepath, Channel voiceChannel)
         {
             // When we use the !play command, it'll start this method
