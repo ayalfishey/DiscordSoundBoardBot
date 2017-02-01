@@ -84,16 +84,19 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Bad Folder Path");
                 Environment.Exit(0);
             }
-
-            commands.CreateCommand("help")
+            // make the command to list commands
+            commands.CreateCommand("list")
               .Do(async (e) =>
             {
-                String list= "!Clear, ";
+                //manualy added Help and Clear
+                String list= "!List, !Clear, ";
+                //go through each of the files and concatanate them with the output string
                 foreach (String com in allfiles)
                 {
                     list +="!"+com+", ";
                 }
-                await e.Channel.SendMessage(list); //delete messeges
+                //send output to the channel
+                await e.Channel.SendMessage(list); 
 
             });
 
