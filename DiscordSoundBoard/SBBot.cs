@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.Audio;
 using NAudio.Wave;
 using System.IO;
+using System.Configuration;
 
 namespace DiscordSoundBoard
 {
@@ -17,9 +18,10 @@ namespace DiscordSoundBoard
         public static CommandService commands;
         public static IAudioClient _vClient;
         private static bool playingSong = false;
-        private string path;    //@"D:\SoundClips\"
+        private string path;
         private string botToken;
         private IEnumerable<String> allfiles;
+        private Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
 
         public SBBot()
@@ -58,13 +60,15 @@ namespace DiscordSoundBoard
 
             });
 
-            path = System.Configuration.ConfigurationManager.AppSettings["SoundPath"]; //get path from config file
-            botToken = System.Configuration.ConfigurationManager.AppSettings["DiscordToken"]; //get token from config file
-            if (System.Configuration.ConfigurationManager.AppSettings["SoundPath"] == "NULL" || System.Configuration.ConfigurationManager.AppSettings["DiscordToken"] == "NULL") //if path or token were not changed make sure to edit them
+            //If path config was not changed prompt user with a request for the path
+            if (config.AppSettings.Settings["SoundPath"].Value == "NULL") 
             {
-                Console.WriteLine("Please edit the config file before running");
-                Environment.Exit(0);
+                Console.WriteLine("Please Enter Sound Clips Path");
+                config.AppSettings.Settings["SoundPath"].Value = Console.ReadLine();
             }
+
+
+            path = config.AppSettings.Settings["SoundPath"].Value; //get path from config file
 
             // get all the files in the sound directory without the extention
             try
@@ -78,6 +82,10 @@ namespace DiscordSoundBoard
                     Console.WriteLine(com);
                     LoadCommand(com);
                 }
+
+                //Save Path
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
             }
             catch
             {
@@ -100,7 +108,14 @@ namespace DiscordSoundBoard
 
             });
 
+            //If token config was not changed prompt user with a request for the token
+            if (config.AppSettings.Settings["DiscordToken"].Value == "NULL")
+            {
+                Console.WriteLine("\nPlease Enter Discord Bot Token");
+                config.AppSettings.Settings["DiscordToken"].Value = Console.ReadLine();
+            }
 
+            botToken = config.AppSettings.Settings["DiscordToken"].Value; //get token from config file
 
             //connect using bot token
             bot.ExecuteAndWait(async () =>
@@ -108,6 +123,10 @@ namespace DiscordSoundBoard
                 try
                 {
                     await bot.Connect(botToken, TokenType.Bot);
+
+                    //Save Token
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("appSettings");
                 }
                 catch
                 {
@@ -137,7 +156,7 @@ namespace DiscordSoundBoard
         }
 
 
-        // Thank you to Rand from the Discord API Discord for this peace of code ajusted by me to fit this project
+        // Thank you Rand from the "Discord API" Discord for this peace of code ajusted by me to fit this project
         //(https://github.com/DjRand/)
 
         public static async Task SendAudio(string filepath, Channel voiceChannel)
