@@ -20,7 +20,7 @@ namespace DiscordSoundBoard
     {
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/drive-dotnet-quickstart.json
-        static string[] Scopes = { DriveService.Scope.DriveReadonly };
+        static string[] Scopes = { DriveService.Scope.DriveReadonly};
         static string ApplicationName = "DiscordDrive";
         static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static UserCredential credential;
