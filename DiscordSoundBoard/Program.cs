@@ -11,7 +11,9 @@ namespace DiscordSoundBoard
     {
         static void Main(string[] args)
         {
+            DriveAccess.getAuth();
             SBBot bot = new SBBot();
+            
         }
     }
 }

@@ -47,6 +47,16 @@ namespace DiscordSoundBoard
            });
             commands = bot.GetService<CommandService>();
 
+
+            commands.CreateCommand("reload")
+             .Do(async (e) =>
+             {
+                 await e.Channel.SendMessage("Reloading Commands");
+                 LoadAllCommands();
+                 await e.Channel.SendMessage("Done Reloading");
+
+             });
+
             //Command clears all messeges but the first one
             commands.CreateCommand("clear")
                 .Do(async (e) =>
@@ -61,43 +71,23 @@ namespace DiscordSoundBoard
             });
 
             //If path config was not changed prompt user with a request for the path
-            if (config.AppSettings.Settings["SoundPath"].Value == "NULL") 
+            if (config.AppSettings.Settings["SoundPath"].Value == "NULL")
             {
                 Console.WriteLine("Please Enter Sound Clips Path");
                 config.AppSettings.Settings["SoundPath"].Value = Console.ReadLine();
             }
 
-
             path = config.AppSettings.Settings["SoundPath"].Value; //get path from config file
 
             // get all the files in the sound directory without the extention
-            try
-            {
-                allfiles = Directory
-                    .EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                    .Select(Path.GetFileNameWithoutExtension);
-                //make a command for each of those files based on its name
-                foreach (String com in allfiles)
-                {
-                    Console.WriteLine(com);
-                    LoadCommand(com);
-                }
+            LoadAllCommands();
 
-                //Save Path
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
-            catch
-            {
-                Console.WriteLine("Bad Folder Path");
-                Environment.Exit(0);
-            }
             // make the command to list commands
             commands.CreateCommand("list")
               .Do(async (e) =>
             {
                 //manualy added Help and Clear
-                String list= "!List, !Clear, ";
+                String list= "!List, !Clear,!Reload ";
                 //go through each of the files and concatanate them with the output string
                 foreach (String com in allfiles)
                 {
@@ -140,6 +130,29 @@ namespace DiscordSoundBoard
             Console.WriteLine(e.Message);
         }
 
+        private void LoadAllCommands()
+        {
+            try
+            {
+                DriveAccess.DownloadFromDrive();
+                allfiles = Directory
+                    .EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                    .Select(Path.GetFileNameWithoutExtension);
+                //make a command for each of those files based on its name
+                foreach (String com in allfiles)
+                {
+                    Console.WriteLine(com);
+                    LoadCommand(com);
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("appSettings");
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Bad Folder Path");
+                Environment.Exit(0);
+            }
+        }
         //Create a single command
         private void LoadCommand(String command)
         {
