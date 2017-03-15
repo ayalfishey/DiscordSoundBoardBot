@@ -72,9 +72,9 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Please Enter Sound Clips Path");
                 config.AppSettings.Settings["SoundPath"].Value = Console.ReadLine();
             }
-
-            path = config.AppSettings.Settings["SoundPath"].Value; //get path from config file
-
+            
+                path = config.AppSettings.Settings["SoundPath"].Value; //get path from config file
+            
             // get all the files in the sound directory without the extention
             LoadAllCommands();
 
@@ -130,7 +130,7 @@ namespace DiscordSoundBoard
         {
             try
             {
-                DriveAccess.DownloadFromDrive();
+                DriveAccess.DownloadFromDrive(path);
                 allfiles = Directory
                     .EnumerateFiles(path, "*", SearchOption.AllDirectories)
                     .Select(Path.GetFileNameWithoutExtension);

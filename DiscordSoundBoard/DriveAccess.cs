@@ -22,12 +22,9 @@ namespace DiscordSoundBoard
         // at ~/.credentials/drive-dotnet-quickstart.json
         static string[] Scopes = { DriveService.Scope.DriveReadonly};
         static string ApplicationName = "DiscordDrive";
-        static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static UserCredential credential;
         public static void getAuth()
         {
-
-
             using (var stream =
                 new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
@@ -44,8 +41,8 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Credential file saved to: " + credPath);
             }
         }
-        public static void DownloadFromDrive() {
-
+        public static void DownloadFromDrive(String path) {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             // Create Drive API service.
             var service = new DriveService(new BaseClientService.Initializer()
             {
@@ -62,8 +59,6 @@ namespace DiscordSoundBoard
                 Console.WriteLine("Please Enter Drive Folder Name");
                 config.AppSettings.Settings["DriveFolder"].Value = Console.ReadLine();
             }
-
-            var path = config.AppSettings.Settings["SoundPath"].Value; //get path from config file
 
             String folderName = config.AppSettings.Settings["DriveFolder"].Value; //get path from config file
 
