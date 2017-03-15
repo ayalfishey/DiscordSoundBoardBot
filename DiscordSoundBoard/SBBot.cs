@@ -58,16 +58,12 @@ namespace DiscordSoundBoard
              });
 
             //Command clears all messeges but the first one
-            commands.CreateCommand("clear")
+            commands.CreateCommand("clean")
                 .Do(async (e) =>
             {
                 Message[] messagesToDelete;
                 messagesToDelete = await e.Channel.DownloadMessages(100); //request 100 last posts
-                var temp = new List<Message>(messagesToDelete); //convert thhe array of messeges to a list for easier managment
-                temp.RemoveAt(messagesToDelete.Length - 1); //removes the first messege from the list
-                messagesToDelete = temp.ToArray();  //convert it back to array
                 await e.Channel.DeleteMessages(messagesToDelete); //delete messeges
-
             });
 
             //If path config was not changed prompt user with a request for the path
@@ -87,7 +83,7 @@ namespace DiscordSoundBoard
               .Do(async (e) =>
             {
                 //manualy added Help and Clear
-                String list= "!List, !Clear,!Reload ";
+                String list= "!List, !Clean,!Reload ";
                 //go through each of the files and concatanate them with the output string
                 foreach (String com in allfiles)
                 {
