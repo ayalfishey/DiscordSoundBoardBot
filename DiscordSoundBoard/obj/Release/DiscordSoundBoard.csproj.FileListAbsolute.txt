@@ -40,3 +40,4 @@ D:\Projects\DiscordSoundBoard\DiscordSoundBoard\bin\Release\Google.Apis.Drive.v3
 D:\Projects\DiscordSoundBoard\DiscordSoundBoard\bin\Release\Google.Apis.PlatformServices.pdb
 D:\Projects\DiscordSoundBoard\DiscordSoundBoard\bin\Release\Google.Apis.PlatformServices.xml
 D:\Projects\DiscordSoundBoard\DiscordSoundBoard\bin\Release\Zlib.Portable.xml
+D:\Projects\DiscordSoundBoard\DiscordSoundBoard\obj\Release\DiscordSoundBoard.csprojResolveAssemblyReference.cache
