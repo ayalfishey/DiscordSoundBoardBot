@@ -12,3 +12,5 @@ You will need to generate your own discord bot token
 https://discordapp.com/developers/docs/topics/oauth2
 
 you can run this bot localy or off a server
+
+API has changed and old one is no longer supported, iv tried a few times to tweek it to see if i can get it running and found its just to much work and id have to remake the whole thing from the ground up so unfortunatly ill have to call it quits on this one and start from scratch on a new one.
